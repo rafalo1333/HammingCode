@@ -84,20 +84,10 @@ class D3Code(Code):
             for j in range(len(msg_matrix)):
                 new_code[i] = (codes_matrix[i][j] * msg_matrix[j] + new_code[i]) % 2
 
-        rest = 0
-        rev_code = list(reversed(code))
-        rev_new_code = list(reversed(new_code))
+        # add the values
 
         for i in range(len(code)):
-            nr = (rev_code[i] + rev_new_code[i] + rest) % 2
-            if rev_code[i] == 1 and rev_new_code[i] == 1:
-                rest = 1
-            else:
-                rest = 0
-            rev_code[i] = nr
-
-        code = list(reversed(rev_code))
-
+            code[i] = (code[i] + new_code[i]) % 2
 
         index = None
 
@@ -110,7 +100,6 @@ class D3Code(Code):
                 break
 
         # fix the error
-
         msg_matrix[index] = int(not msg_matrix[index])
 
         return msg_matrix
@@ -146,17 +135,30 @@ class D4Code(D3Code):
 
         return code
 
+    def get_wrong_message(self):
+        '''Returns the wrong message as list needed to test the Hamming Code.'''
+        msg = list(self.message)
+        index = random.randint(0, len(msg)-1)
+        msg[index] = int(not msg[index])
+        return msg
+
     def get_corrected_message(self, wrong_message):
         '''Returns the fixed message for a given wrong_message.'''
         msg_matrix = wrong_message
         code = self.get_message_code()
+        new_code = [0, 0, 0, 0]
         codes_matrix = self.get_codes_matrix()
 
         # get the comparison matrix
 
         for i in range(len(codes_matrix)):
             for j in range(len(msg_matrix)):
-                code[i] = (codes_matrix[i][j] * msg_matrix[j] + code[i]) % 2
+                new_code[i] = (codes_matrix[i][j] * msg_matrix[j] + new_code[i]) % 2
+
+        # add the values
+
+        for i in range(len(code)):
+            code[i] = (code[i] + new_code[i]) % 2
 
         index = None
 
@@ -176,7 +178,7 @@ class D4Code(D3Code):
 
 if __name__ == '__main__':
     # tests area
-    c = D4Code((0, 0, 0, 1))
+    c = D4Code((1, 0, 0, 1))
     print c.message, c.get_message_code()
     msg = c.get_wrong_message()
     print 'Wrong message: %s' % msg
